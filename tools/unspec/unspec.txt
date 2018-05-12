@@ -1,0 +1,156 @@
+## Program unspec (version 18. 1. 2017) ##
+## (c) Petr Mikulik  (http://www.sci.muni.cz/~mikulik/)  1994--2017
+
+Usage:
+  unspec input_spec_file [ - | out_files_name [out_files_extension] ] [options]
+
+In general, this program is used to split the input spec file into a series of
+output files each containing one scan only (unless option -1 or -2 is given or
+stdout goes to stdout).
+
+If the output file is -, e.g. 'unspec xxx.spec - <opts>'), then the extracted
+scans go all to screen (stdout). If the output is <out_name>, e.g. using
+'unspec xxx.spec abc <opts>', then the output files are abc01, abc02, abc03,
+etc. If the output file is specified by <out_name> <out_ext>, e.g. using
+'unspec xxx.spec abc dat <opts>', then the output files are abc01.dat,
+abc02.dat, abc03.dat, etc. Using option -3 changes the above to abc001, abc002,
+...; abc001.dat, abc002.dat,..., option '-4' to abc0001, abc0002,...
+With option -1 the output file name is <out_name><scan_from_nb><out_ext>,
+while with option -2 the output file name does not contain the scan number,
+thus being identical to the result of
+'unspec input.spec - -1 >my_output.dat'.
+
+
+Options:
+  -s  <scan>        ... extract only this scan (default: all scans)
+  -r  <from>  <to>  ... extract this range of scans (default: all scans)
+  -f  <from>        ... extract all scans since this one
+  -t  <to>          ... extract all scans until this one
+  -R  <ranges>      ... extract given scans, syntax like: 1,5,8:12,30
+  -T  ascan         ... only scans containing this string, e.g. ascan or a2scan;
+                        use grep or text editor to look at lines with #S
+  -1                ... all scans go to one file (i.e. append scans)
+  -2                ... all scans go to one file, no scan number in its name
+  -3                ... 3-digit scan number file indexing (default is 2)
+  -4                ... 4-digit scan number file indexing (default is 2)
+  -b  <n>           ... in each scan, write a blank line after each n-th point;
+                        useful mainly when the scan has been produced by 'mesh'
+  -S                ... spec file is not read after the last scan given via the
+                        options -s, -r, -R and -t. This switch lets unspec read
+                        the file until the end. Could be useful for a curious
+                        case with two same scan numbers or scan indexing error
+  -B                ... no blank line between scans (useful for writing out
+                        matrices, use together '-B -[1|2] -#')
+  -H                ... copy header of the input spec file to the output file
+  -#                ... do not write out any spec comment (# lines) of scans
+  -c  COMMENTSCHARS ... write these scan #comments (default SDTPL)
+                        Using lowercase letters strips the #comment name
+                        (useful when importing data to a spreadsheet). Use
+                        empty string, i.e. '-c ""), to output all comments
+  -i                ... reindex scans (ignore scan number in #S, start from 1)
+  -Pn               ... don't write PSD/MCA spectra (lines with @A)
+  -Py               ... write PSD/MCA spectra (lines with @A)
+  -PMCADEV <n>      ... write the first PSD/MCA data found (-1, default) or
+                        only those belonging to @MCADEV (0,1,...) as indicated
+                        in scan headers (if multiple MCA devices connected)
+  -Pr  <from>  <to> ... write out only ROI for PSD spectra (from>=1); writing
+                        ROI can be suppressed by to<from
+  -Pe  <n>          ... write out every n-th channel (default 1 = all channels)
+  -Pa  <n>          ... average (smoothen) intensity over n PSD channels
+  -PI  <ranges>     ... print columns of intensities integrated over the given
+                        PSD channels, or output only specified PSD channels;
+                        e.g. '-PI 100:400,255,250:260'
+  -P@A...           ... write PSD spectra in columns on new lines starting @A
+  -PR               ... write out PSD spectra in rows with the channel number
+                        or with angular positions, see options '-P0' and '-P1'
+  -P0  <x>          ... channel of the primary beam, i.e. angle=0; see '-PR'
+  -P1  <x>          ... number of channels per 1 degree; see '-PR'
+  -PM  <fileprefix> ... PSD/MCA spectra can be saved in the main spec file or
+                        in separate files, see option 'to' in 'mcasetup' in
+                        spec. Unspec supposes the former by default, while the
+                        latter choice needs to know that <fileprefix>; then
+                        spectra recorded during scans will be found and read.
+                        Note that 'mcasave' files cannot be inserted into the
+                        spec file, since they are not mentioned therein (hint:
+                        see Solutions below what to do in that case)
+  -v                ... be verbose (do not print text on screen)
+  -w <columns>      ... which columns go to output (default: whole scan line)
+                        <columns> specification can list columns, ranges of
+                        columns, and motor or detector names (as found in #L
+                        and #O lines of the spec file, ignoring letter case and
+                        spaces). Since #L are column titles, unspec can reduce
+                        number of columns on output, and extend it by values #P
+                        of motors fixed during that scan.
+                          Example:  -w 1,2:4,-1,-2,Theta,ome,scintil
+                        selects column 1 to 5, the last and last but one, and
+                        those of Theta and Ome motors and Scintil detector.
+                        Further, the following special names are understood:
+                          '#' print scan number
+                          '@' print point number in the scan
+                          '=' auto find + print all motors changed in the scan
+                              (most standard scans and meshes are understood)
+                          Example:  -w =,det
+  -L                ... display software license
+
+Examples, where  'gesi'  is an experimental data file produced by spec:
+  unspec gesi x dat -3      ... writes files x000.dat, x001.dat, x002.dat,...
+  unspec gesi - -s 10 -#    ... writes scan 10 without comments to stdout
+  unspec gesi p -r 20 22    ... makes p20, p21 and p22 with scans 20..22
+  unspec gesi p -T "ascan  th" ... extract all ascans with th motor
+  unspec gesi p q -s 6 -c l ... makes p06.q, its header describes data columns
+  unspec gesi z -1 -w th,det -3 -f 90 ... makes single file z090 with all scans
+                                from 90 and columns of motors 'th' and 'det'
+  unspec gesi z.dat -2 -s 5 ... makes single file z.dat with scan number 5
+  unspec gesi s dat -w =,det... write detector and the moving motor positions
+
+Solutions:
+ (*) Use the command "grep #S mydata.spec" to list all scans in a spec file.
+ (*) Convert PSD/MCA files from 'mcaacq' / 'mcasave' commands to a single table
+     1. These mca files gesi_mca/gesi_0sss_0nnn.mca were made during a scan
+        written in .spec file:
+        unspec gesi.spec mcascan dat -s 13 [OPTS] -PM gesi_mca/gesi
+        where OPTS can be like  -w phi,delta,filter,mon  -PR
+     2. Use only .mca files -- however, there is no information about other
+        detectors like sec, mon, filter, so you cannot do proper normalization:
+        rm -f out.dat
+        for i in gesi_0*.mca; do unspec $i - [OPTS] >>out.dat; done
+        where OPTS can be like  -w phi,delta -PR  (filter, mon not available)
+ (*) Make a single spec file with all mca spectra saved separately in mca/:
+     unspec b1.spec b1-all.spec -2 -H -PM mca/b1 -P@A
+
+Examples for using unspec with gnuplot 4.0 (or later, see www.gnuplot.info):
+For plotting a single scan of a running experiment, type a command like
+  gnuplot> plot "<unspec abc.spec - -v -# -s 10" u 1:7 title "scan 10"
+For plotting a map by spec's mesh (number of inner motor intervals 100), do
+  gnuplot> !unspec abc.spec map.dat -2 -# -s 19 -w ome,tth,det -b 101
+(mesh is scan nb 19) or when the map is measured by a series of scans 19..69
+  gnuplot> !unspec abc.spec map.dat -2 -# -r 19 69 -w ome,tth,corr_det
+and then
+  gnuplot> set pm3d map; set autoscale fix; set log cb; splot 'map.dat'
+
+Note that you can print this documentation by commands (supposing bash shell):
+  unspec 2>unspec.txt; unspec -L 2>>unspec.txt; a2ps -B -2 -o out.ps unspec.txt
+
+
+## Program unspec (version 18. 1. 2017) ##
+
+   Copyright (C) 1994--2017 Petr Mikulik
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2, or (at your option)
+   any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+
+   The latest distribution of the program can be downloaded from the
+   author's homepage http://www.sci.muni.cz/~mikulik/. Your comments or
+   suggestions are welcome.

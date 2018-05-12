@@ -1,0 +1,157 @@
+Program: unspec
+Version: January 18, 2017
+Program homepage: http://www.sci.muni.cz/~mikulik/
+
+Author:  Petr Mikulik
+E-mail:  mikulik@physics.muni.cz
+Web:     http://www.sci.muni.cz/~mikulik/
+
+Freeware: yes, source code included
+Copying policy: GNU General Public License
+Operating systems supported: any OS equipped with a C++ compiler;
+	precompiled binaries (may be) available for Unixes (Linux, HP-UX),
+	OS/2, DOS, Windows
+
+
+==============================================================================
+
+Table of contents:
+	Description
+	Compilation
+	Installation
+	Usage
+	History
+
+==============================================================================
+
+
+Description:
+============
+
+unspec is a program for extracting scans from data files created by the "spec"
+program (by Certified Software) used for driving motors, detectors,... as it
+is used for synchrotron experiments at ESRF, for instance.
+  We used "unspec" to extra data from the spec data files in order to preview
+or print them during experiments ("spec" itself has very primitive and awful
+graphics, look at those stupid tics on x/y axes, for instance) and for
+treating the data after an experiment.
+  We used "gnuplot" program for data plotting and printing, since it runs on
+any platform and is free; the mouse support in gnuplot (since 1998) makes it
+far superior (not, let's say alternative, for instance) to even "specplot"
+program developed by ESRF.
+
+  Unspec is command-line driven with many useful options. See "Usage" below
+for more information.
+
+
+Compilation:
+============
+
+Use the enclosed Makefile; type
+	make
+to list the predefined platforms + compilers.
+
+
+Installation:
+=============
+
+Move 'unspec' or 'unspec.exe' somewhere along your PATH, or make an alias
+to its non-PATH location.
+
+
+Usage:
+======
+
+You run 'unspec' from a command line by
+	  unspec input_spec_file <options>
+Typing
+	unspec
+will describe you all available options as well as some examples.
+
+The following commands can be used to print the documentation:
+1. supposing bash-like (bash or OS/2's cmd.exe):
+     unspec 2>doc.txt
+     unspec -L 2>>doc.txt
+     a2ps -nP -nH -nL -2 <doc.txt >doc.ps
+2. supposing csh shell on Unix:
+     unspec >&! doc.txt; unspec -L >>& doc.txt
+     a2ps -nP -nH -nL -2  < doc.txt  >! doc.ps
+and then print file doc.ps.
+
+
+History:
+========
+
+- January 2017:
+  - Fix compiler (gcc 4.8, clang) warnings.
+- November 2015:
+  - New option -T to select scans only of a given name or motor.
+    It is something like you would get (less conveniently) by
+    grep '#S' data.spec  or  grep ascan data.spec  or by
+    unspec ... -R numbers  with numbers printed by such an awk script:
+    $1 == "#S" && $3=="ascan" { printf $2 "," }
+- August 2012:
+  - Support for data from multiple MCA's (PSD's), any of them could have been
+    switched on/off during measurement. Then scans in the spec file have lines
+    with @MCADEV 0, @MCADEV 1 etc. New option "-PMCADEV <n>" to choose data
+    from which one goes to output.
+  - Fix for autoguess of the scan motor.
+  - Fix for motor/detector names update if broken header.
+- February 2011:
+  - Extended an #ifdef for Apple (MacOSX).
+- May 2010:
+  - Support new C++ norm (#include <xxxx> instead of <xxxx.h>).
+  - Allow up to 100 lines of motors in the header (10 allowed until now).
+- April 2004:
+  - Let data files extracted from single MCA files (without the spec file --
+    e.g. created by the "ct" command) can print motor positions as requested
+    by the option "-w" as well.
+- February 2003:
+  - Let it compile under more strict ANSI C++.
+- November 2002:
+  - New option "-4".
+- April 2001:
+  - Bugfixs for PSD spectra - sometimes output of more channels than read;
+    '-Pe' was switched off by '-Pa'.
+- February 2001:
+  - Bugfix for a double line in some cases.
+- December 2000:
+  - New options "-H", "-P@A".
+- November 2000:
+  - Option  -c ""  outputs all comments.
+  - Many improvements to the PSD/MCA part.
+  - New options "-PR", "-P0", "-P1", "-PI", "-PM".
+  - Allow the combination "-Py -w th,del,etc".
+- October 2000:
+  - Specify selected output scans by "-R 1,10,20:30".
+  - Options "-Pn", "-Pr", "-Pa", -"Pe" to deal with the PSD/MCA spectra.
+  - Stop reading spec file is the last scan number given by "-s", "-r", "-R",
+    "-t" was reached; use "-S" for files with scan indexing error.
+  - Support for "logical" motor called '@' (point number in the scan).
+- September 2000:
+  - Allow partial match between the motor/detector names (for the option "-w").
+  - Support for PSD/MCA spectra - those spec lines starting with "@A".
+- June 2000:
+  - Print a blank line in between 2 scans for output to a single file.
+  - New options -2, -B.
+  - Support for "logical" motors called '#' (scan number) and '=' (autofind
+    motors changed in the scan).
+  - More examples into the documentation.
+- March 2000:
+  - A bug fix.
+- February 2000:
+  - Added option "-w": output only selected columns, supporting also mnemonical
+    motor and detector names.
+- 1995 -- 1999:
+  - Successfully and often used. Some options added from time to time, when
+    needed new features.
+- 1994:
+  - The first version (measurements at the ESRF Optics Beamline).
+
+
+-----------------------------------------------
+  Petr Mikulik
+  Department of Condensed Matter Physics
+  Faculty of Science
+  Masaryk University
+  Brno, Czech Republic

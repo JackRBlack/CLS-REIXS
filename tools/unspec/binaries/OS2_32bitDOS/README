@@ -1,0 +1,4 @@
+This executable runs under OS/2 and eComStation (requires emx.dll).
+
+It will run also under 32bit DOS (including various DOS boxes)
+using EMX or RSX extenders (emx.exe or rsx.exe somewhere on the PATH).

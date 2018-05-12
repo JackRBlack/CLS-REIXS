@@ -1,0 +1,91 @@
+A very short tutorial for spec, unspec and gnuplot by Petr Mikulik
+First version: very very long time ago
+Last update: May 2010
+
+
+***** USING gnuplot *****
+
++ gnuplot
+Some useful gnuplot commands:
+General setting:
++ set log y
++ unset log
++ set grid	# make grid in xtics
++ unset grid
++ set xtick 0.01  # make tics on x axis with the given step
++ replot	# replots the last plot
++ show _option_	# shows the given option
++ help _sth_	# helps you
+
+2D plotting (graphs):
++ plot 1, x*x	# plots horizontal line and function x^2
++ replot sin(x)	# replot the last plot, and this function
++ plot 'a01.dat' u 1:5 w l, '' u 1:6 w lp
+   (plots file a01.dat, column 1 vs. 5, using lines, 1 vs 6 with linespoints)
++ replot 'a02.dat' u ($2+1):($6/$7)
+   (plots the prev. plot and over it new plot of the file a02.dat with shifted
+   second column vs. the ratio of columns 6 and 7).
+
+3D plotting (surfaces, contours):
++ splot x*sin(y)
++ splot 's001.dat' u 1:4:5 w linesp
++ set contour base   # if used before splot, then plots contours
++ set cntrparam _options_ 	# these options drive the plotting
++ set pm3 map
++ set palette gray
+
+Printing from gnuplot:
+Method 1: creating postscript file, then printing it:
++ set term postscript landscape [color]
++ set out "my_out.ps"
++ replot
++ set out		# this closes the file
++ set term pop		# back to previous terminal
++ !lpr my_out.ps
+Method 2: without creating postscript file:
++ set term postscript landscape
++ set out "|lpr"	# pipe the output to the printer
++ replot
++ set out		# this closes the pipe, thus the printer can plot it
++ set term pop		# back to previous terminal
+
+
+*** Most important SPEC commands ***
+qdo macro_file.mac
+lsdef *Qz*	# this lists all our *Qz* macros
+prdef mv2Q      # this prints the current definition of the macro mv2Q
+p 2*sin(PI/2)	# print result of this expression
+set_lm _motor_	# set limits
+wm (where motor), wa (where all)
+config		# change spec configuration (use ', <ENTER>, Ctrl/C)
+setplot		# (cplot setup?)
+ond / offd (set on/off datafile)
+ascan, dscan; a2scan, d2scan; a3scan, d3scan
+ct <n>		# time in seconds or negative measuring time number in the scan
+		# description means 'count to fixed number of monitor counts'
+		# (avoid fluctuations of the primary beam, beam losses etc.).
+pic, cen, where # very useful macros from the "dtp" (Daniel, Tilo, Petr) collection:
+		# go to peak or center of the previous scan, show on graph current position
+ascan, a2scan   # other very useful "dtp" macros: scans using absolute step value
+
+
+*** SPEC and PSD/MCA ***
+
+- "mcasetup"
+- "mcaon" and "mcaoff" switches recording the MCA data into the datafile
+- "mcaroi" defines the range or interest that is integrated by new counter.
+  Its name must be in "config" among the other counters.
+- viewing the real-time MCA acquisition: at the command line "mca_wish"
+
+
+*** EXTRACTING DATA BY UNSPEC ***
+
+Example of extracting data:
+
+     >unspec ftc1.spec s x -w mu,det_corr,monitor
+
+produces output files (each scan in one file "s??.x") with 3 columns 
+mu,det_corr,monitor, thus use gnuplot to plot them by
+     gnuplot> plot 's06.x' u 1:($2/$3)
+
+#end
