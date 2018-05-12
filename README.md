@@ -1,2 +1,2 @@
 # CLS-notebook
-This is a notebook for conducting experiments at Canadian Light Source.
+Personal records at the Canadian Light Source, resonant elastic/inelastic X-ray scattering (beamline 10ID-2).
